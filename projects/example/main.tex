@@ -1,0 +1,202 @@
+\input{style/sqtbeamer.tex}
+
+\title{Making Slides}
+\subtitle{Education subcommittee guide}
+\institute{Sydney Quant Traders}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+\begin{frame}{Using tcolorboxes}
+  Colored boxes are used for important definitions (yellow) and results (blue).\\
+  This color-coding is used by Sheldon Axler and Zdravko Botev.
+
+  \vspace{1cm}
+
+  There is no requirement for the definition boxes to be self-contained definitions:
+  \begin{itemize}
+    \item Let $(\Omega, \mathcal H, \mathbb P)$ be a probability space
+    \item Let $X:\Omega\to \mathbb R$ be $\mathcal H$-measurable
+  \end{itemize}
+
+  \begin{sqt:definition}[Definition: Expectation]
+    $$\mathbb E X := \int \mathbb P(\dif \omega)\, X(\omega) $$
+  \end{sqt:definition}
+\end{frame}
+
+\begin{frame}{Using tcolorboxes}
+  Define the following:
+  \begin{itemize}
+    \item Let $(\Omega,\mathcal F, \mathbb P, \mathbb F)$ be a filtered probability space
+    \item Let $f$ be a process in $L^2_{\mathbb F}$
+    \item Let $I_t=\int_0^t f_s\d\!W_s$
+  \end{itemize}
+  \begin{sqt:result}[Theorem: It\^o isometry]
+    $$\mathbb E[I_t^2] = \mathbb E\left[\int_0^t f^2_s\d s\right]$$
+  \end{sqt:result}
+\end{frame}
+
+\section{Diagrams}
+
+\begin{frame}{Images and Diagrams}
+  Insert images just like you would in a normal \LaTeX\ project
+  \begin{itemize}
+    \item things based on pgf
+    \begin{itemize}
+      \item tikz
+      \item pgfplots
+    \end{itemize}
+    \item using graphicx to insert pngs, jpegs, pdfs and others
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Tikz}
+  Tikz is a language used to draw diagrams in \LaTeX.
+  Learning tikz is tough but you can make diagrams in 
+  mathcha.io (which is a WYSIWYG), and export as tikz code.
+  \begin{columns}
+    \begin{column}{0.4\textwidth}
+      \begin{center}
+        \input{assets/nerd.tex}
+      \end{center}
+    \end{column}
+  
+    \begin{column}{0.6\textwidth}
+      \begin{sqt:definition}[Definition: Nerd]
+        Yes I am a nerd, bookworm, I'm studious.
+        From my cerebral cortex to my gluteus.
+      \end{sqt:definition}
+    \end{column}
+  \end{columns}
+
+\end{frame}
+
+% here ---------\
+%               v
+\begin{frame}[fragile]{Beamer Fragile Issues}
+  \begin{sqt:result}[Theorem: Beamer Fragile Issues]
+    Sometimes your \LaTeX\ code works outside of a Beamer frame, but doesn't work
+    when put inside a Breamer frame.
+    I have no idea how this happens. But if you add the optional argument ``fragile''
+    next to the \verb|\begin{frame}| statement, then it works.
+  \end{sqt:result}
+
+  \begin{center}
+    \begin{tikzcd}
+      U\cap V \rar[hook]{i}\dar[hook]{j} & 
+      U \dar[hook]{j'}\arrow[ddr, bend left, "\forall f"] &\\
+      V \arrow[r, hook, "i'"]\arrow[drr, bend right, "\forall g"'] & 
+      X \arrow[dr, dotted, "\exists ! h" description] &\\
+      & & \forall Y
+    \end{tikzcd}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Drawing Diagrams}
+  You may use anything you want to draw diagrams,
+  as long as the result looks clean and professional.
+  I highly recommend Inkscape over tikz, for a fast workflow.
+
+  \centering
+  \includegraphics[width=5cm]{assets/example.pdf}
+
+\end{frame}
+
+\begin{frame}[fragile]{Matplotlib}
+  \centering
+  \includegraphics[width=10cm]{assets/brownian_motion.pdf}
+\end{frame}
+
+\begin{frame}[fragile]{Matplotlib}
+  \begin{minted}{py}
+    # Configure matplotlib to use PGF backend for LaTeX compatibility
+    matplotlib.use("pgf")
+    matplotlib.rcParams.update({
+        "pgf.texsystem": "pdflatex",
+        "font.family": "serif",
+        "font.size": 11,
+        "text.usetex": True,
+        "pgf.rcfonts": False,
+    })
+    # ... make plot ...
+
+    # Save as PGF file
+    plt.savefig(save_path, bbox_inches='tight')
+    print(f"Plot saved to {save_path}")
+    
+    # Also save as PDF for preview
+    pdf_path = save_path.replace('.pgf', '.pdf')
+    plt.savefig(pdf_path, bbox_inches='tight')
+    print(f"PDF preview saved to {pdf_path}")
+  \end{minted}
+
+\end{frame}
+
+\section{Coding}
+
+\begin{frame}[fragile]{Code Snippets}
+
+  You can get proper syntax highlighting with \verb|minted|.\\
+  This requires having python and Pygments installed on your machine.\\
+  Code snippets won't work inside a Beamer frame unless you use \verb|fragile|.
+
+  \begin{minted}{cpp}
+    template<class T, size_t N = 10>
+    class Buffer : public Container<T> {
+        T* data_{new T[N]};  // meow
+    public:
+        ~Buffer() { delete[] data_; } // woof
+        T& operator[](size_t i) { return data_[i]; }
+    };
+  \end{minted}
+
+  Notice that all indentation in the \LaTeX\ source code
+  within the snippet is shown verbatim in the rendered slide. 
+\end{frame}
+
+\begin{frame}[fragile]{More Code Examples}
+  \begin{columns}
+  \begin{column}{0.5\textwidth}
+  \begin{minted}{cpp}
+    template<typename T>
+    class Stack {
+    private:
+        std::vector<T> data;
+        
+    public:
+        void push(const T& item) {
+            data.push_back(item);
+        }
+        
+        T pop() {
+            T value = data.back();
+            data.pop_back();
+            return value;
+        }
+        
+        bool empty() const; // omitted
+    };
+  \end{minted}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    You can put diagrams here to assist with 
+    explaining the code.
+
+    \begin{center}
+      \includegraphics[width=4cm]{assets/stack.png}
+    \end{center}
+  \end{column}
+\end{columns}
+\end{frame}
+
+
+\section{Further Examples}
+
+      
+
+
+
+\end{document}
