@@ -1,0 +1,35 @@
+% Reusable six-sided die macro.
+% Usage: \die{n}      draws a d6 showing face n (1-6)
+%        \die[<opts>]{n}  passes extra tikzpicture options (e.g. scale=0.8)
+%
+% Pips are laid out on a 2x2 grid inside a rounded square.
+\newcommand{\diepip}[2]{\fill[black] (#1,#2) circle (0.16);}
+
+\NewDocumentCommand{\die}{O{} m}{%
+  \begin{tikzpicture}[scale=0.7, #1]
+    \draw[rounded corners=4pt, fill=white, line width=1pt] (0,0) rectangle (2,2);
+    \ifcase#2\relax
+      % 0: blank
+    \or % 1
+      \diepip{1.0}{1.0}
+    \or % 2
+      \diepip{0.5}{1.5}\diepip{1.5}{0.5}
+    \or % 3
+      \diepip{0.5}{1.5}\diepip{1.0}{1.0}\diepip{1.5}{0.5}
+    \or % 4
+      \diepip{0.5}{1.5}\diepip{1.5}{1.5}\diepip{0.5}{0.5}\diepip{1.5}{0.5}
+    \or % 5
+      \diepip{0.5}{1.5}\diepip{1.5}{1.5}\diepip{1.0}{1.0}\diepip{0.5}{0.5}\diepip{1.5}{0.5}
+    \or % 6
+      \diepip{0.5}{1.5}\diepip{1.5}{1.5}\diepip{0.5}{1.0}\diepip{1.5}{1.0}\diepip{0.5}{0.5}\diepip{1.5}{0.5}
+    \fi
+  \end{tikzpicture}%
+}
+
+% A blank "unknown" die (question mark face), for hidden rolls.
+\NewDocumentCommand{\diehidden}{O{}}{%
+  \begin{tikzpicture}[scale=0.7, #1]
+    \draw[rounded corners=4pt, fill=black!5, line width=1pt] (0,0) rectangle (2,2);
+    \node at (1,1) {\Large\bfseries ?};
+  \end{tikzpicture}%
+}

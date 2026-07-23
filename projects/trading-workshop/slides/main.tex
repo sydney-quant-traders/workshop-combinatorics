@@ -1,0 +1,225 @@
+\input{style/sqtbeamer.tex}
+\usepackage{tikz}
+
+% Dice macros (\die{n}, \diehidden) for the trading sims.
+\input{assets/dice.tex}
+
+\title{Trading Workshop}
+\subtitle{Mock Trading with a Live Engine}
+\institute{Sydney Quant Traders}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+% =====================================================================
+% NOTE ON FORMAT
+% ---------------------------------------------------------------------
+% This deck is a *skeleton*. The slides provide visuals to guide the
+% workshop; the actual trading happens in the mock trading engine.
+%
+% Slides marked "TODO" are intentionally left empty to be filled in.
+% Each trading sim ("Trading Sim") is a round played on the engine ---
+% the slide is just the prompt / visual shown to the room.
+% =====================================================================
+
+
+% #####################################################################
+\section{Introduction to Trading}
+% #####################################################################
+% Short intro (a condensed version of Intro to Quant). Leave empty for now.
+
+\begin{frame}{What is Trading?}
+  % TODO: fill in --- high level: exchanging assets, why we trade.
+\end{frame}
+
+\begin{frame}{Buying and Selling}
+  % TODO: fill in --- bids/asks, what it means to buy vs sell, price.
+\end{frame}
+
+\begin{frame}{Position and Max Position}
+  % TODO: fill in --- long/short position, PnL from position,
+  % the max position limit enforced by the engine.
+\end{frame}
+
+\begin{frame}{How the Trading Engine Works}
+  % TODO: fill in --- how players connect, send bids/asks, see the book,
+  % how positions are liquidated at the true value at the end of a round.
+\end{frame}
+
+
+% #####################################################################
+\section{Trading Sim 1: Sum of Five Dice}
+% #####################################################################
+
+\begin{frame}{Trading Sim 1: Sum of Five Dice}
+  \begin{sqt:definition}
+    The true value of the asset is the \textbf{sum of five dice rolls}.
+    $$V = d_1 + d_2 + d_3 + d_4 + d_5, \qquad d_i \sim \mathrm{Unif}\{1,\dots,6\}.$$
+  \end{sqt:definition}
+
+  \begin{itemize}
+    \item Make a market on $V$ in the trading engine.
+    \item Everyone can see the dice --- there is no hidden information yet.
+    \item At the end, positions are liquidated at the true $V$.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{What is a fair value for $V$? How wide should your market be?}
+\end{frame}
+
+\begin{frame}{The Five Dice}
+  \begin{center}
+    \vspace{0.4cm}
+    % TODO: set the rolled values here (currently 3, 5, 2, 6, 4).
+    \die{3}\hfill\die{5}\hfill\die{2}\hfill\die{6}\hfill\die{4}
+
+    \vspace{0.8cm}
+    {\Large $3 + 5 + 2 + 6 + 4 = \mathbf{20}$}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Fair Value}
+  % TODO: fill in --- E[one die] = 3.5, so E[V] = 5 * 3.5 = 17.5.
+  % Discuss variance / how tight a market you can make.
+\end{frame}
+
+
+% #####################################################################
+\section{Trading Sim 2: Estimation with Reveals}
+% #####################################################################
+% An estimation market where information is revealed over rounds.
+
+\begin{frame}{Trading Sim 2: Estimation Game}
+  \begin{sqt:definition}
+    The true value is some real-world quantity that nobody knows exactly.
+    Clues are \textbf{revealed round by round}; update your market as you learn more.
+  \end{sqt:definition}
+
+  % TODO: pick the quantity, e.g. "number of X", "volume of Y".
+  \textbf{The asset:} \textcolor{sqt-question}{TODO --- state the quantity to estimate.}
+\end{frame}
+
+\begin{frame}{Estimation Game: Reveals}
+  \textbf{Round 1}
+  \begin{itemize}
+    \item % TODO: first clue. Players open a market and trade.
+  \end{itemize}
+
+  \onslide<2->{
+    \textbf{Round 2}
+    \begin{itemize}
+      \item % TODO: second clue. Players refine and trade.
+    \end{itemize}
+  }
+
+  \onslide<3->{
+    \textbf{Round 3}
+    \begin{itemize}
+      \item % TODO: third clue. Players refine and trade.
+    \end{itemize}
+  }
+
+  \onslide<4->{
+    \vspace{0.3cm}
+    \begin{sqt:result}
+      \textbf{True value:} TODO. Liquidate all positions here.
+    \end{sqt:result}
+  }
+\end{frame}
+
+
+% #####################################################################
+\section{Pricing Futures}
+% #####################################################################
+
+\begin{frame}{What is a Future?}
+  % TODO: fill in --- agreement now to exchange an asset at a fixed
+  % price at a fixed future date. Contrast with a spot trade.
+\end{frame}
+
+\begin{frame}{Pricing a Future}
+  % TODO: fill in --- fair future price = spot compounded to expiry.
+  % F = S * (1 + r)^t. Intuition via no-arbitrage / cost of carry.
+\end{frame}
+
+\begin{frame}{Trading Sim 3: Pricing a Basic Future}
+  \begin{sqt:definition}
+    The asset is a \textbf{future}: it settles at a spot value $S$ compounded
+    at a per-period rate $r$ over $t$ periods.
+    $$F = S \,(1+r)^{t}.$$
+  \end{sqt:definition}
+
+  \begin{itemize}
+    \item % TODO: give S, r, t. e.g. S = 100, r = 5\% per period, t = 3.
+    \item Make a market on $F$ --- this is really an exercise in estimating
+      compound interest in your head.
+  \end{itemize}
+
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{Estimate $(1+r)^t$ quickly. When is the linear
+  approximation $1 + rt$ good enough?}
+\end{frame}
+
+
+% #####################################################################
+\section{Pricing Options}
+% #####################################################################
+
+\begin{frame}{What is an Option?}
+  % TODO: fill in --- the RIGHT but not the obligation to buy (call)
+  % at a strike K. Payoff = max(V - K, 0). Why it is never negative.
+\end{frame}
+
+\begin{frame}{Trading Sim 4: Option on a d6, Strike 3}
+  \begin{sqt:definition}
+    A single die is rolled, value $d \sim \mathrm{Unif}\{1,\dots,6\}$.
+    The asset is a \textbf{call option} with strike $K = 3$:
+    $$\text{payoff} = \max(d - 3,\; 0).$$
+  \end{sqt:definition}
+
+  \begin{center}
+    \diehidden
+
+    \vspace{0.4cm}
+    \begin{tabular}{c|cccccc}
+      $d$ & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+      $\max(d-3,0)$ & 0 & 0 & 0 & 1 & 2 & 3 \\
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{What is the fair price of this option?}
+  % Fair value = (0+0+0+1+2+3)/6 = 1.
+\end{frame}
+
+\begin{frame}{Trading Sim 5: Option on Sum of Three d6, Strike 11}
+  \begin{sqt:definition}
+    Three dice are rolled, $S = d_1 + d_2 + d_3$.
+    The asset is a \textbf{call option} with strike $K = 11$:
+    $$\text{payoff} = \max(S - 11,\; 0).$$
+  \end{sqt:definition}
+
+  \begin{center}
+    \die{4}\hspace{0.6cm}\die{6}\hspace{0.6cm}\die{3}
+    % TODO: set / hide dice as appropriate for the sim.
+  \end{center}
+
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{Fair price? $\mathbb{E}[\max(S-11,0)]$ over the
+  distribution of the sum of three dice.}
+  % E[S] = 10.5; need the payoff distribution above the strike.
+\end{frame}
+
+
+% #####################################################################
+\section{Wrap Up}
+% #####################################################################
+
+\begin{frame}{Wrap Up}
+  % TODO: fill in --- recap of fair value, spreads, futures, options,
+  % and takeaways for trading interviews.
+\end{frame}
+
+\end{document}
