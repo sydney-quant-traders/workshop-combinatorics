@@ -4,6 +4,30 @@
 % Dice macros (\die{n}, \diehidden) for the trading sims.
 \input{assets/dice.tex}
 
+% Payoff-diagram helper: \payoff{<tikz drawing commands>} draws a set of
+% payoff axes (underlying price S on x, payoff on y) and runs the given
+% commands inside. Strikes / curves are drawn by the caller.
+\newcommand{\payoff}[1]{%
+  \begin{tikzpicture}[scale=0.5,baseline=(current bounding box.center)]
+    \draw[->,gray!60] (-0.2,0) -- (6.6,0) node[right,black]{\scriptsize $S$};
+    \draw[->,gray!60] (0,-0.9) -- (0,3.3) node[above,black]{\scriptsize payoff};
+    #1
+  \end{tikzpicture}}
+
+% SPEAKER NOTES ------------------------------------------------------
+% Each content slide has a \note{...} with talking points to build a
+% speech around. They are HIDDEN in the normal build. To see them:
+%   * `make notes`  builds main-notes.pdf with each slide + its notes
+%     side by side (needs a second monitor in Presenter mode, or just
+%     read the PDF). This is driven by the SQT_NOTES flag below.
+%   * Or uncomment the next line to interleave notes into main.pdf:
+% \setbeameroption{show notes}
+\ifdefined\SQTNOTES
+  \usepackage{pgfpages}
+  \setbeameroption{show notes on second screen=right}
+\fi
+% --------------------------------------------------------------------
+
 \title{Trading Workshop}
 \subtitle{Mock Trading with a Live Engine}
 \institute{Sydney Quant Traders}
@@ -31,22 +55,97 @@
 % Short intro (a condensed version of Intro to Quant). Leave empty for now.
 
 \begin{frame}{What is Trading?}
-  % TODO: fill in --- high level: exchanging assets, why we trade.
+  \begin{sqt:definition}
+    \textbf{Trading} is exchanging an asset for an agreed price. Every trade
+    has two sides: a \textbf{buyer} and a \textbf{seller}.
+  \end{sqt:definition}
+
+  \begin{itemize}
+    \item A trade happens only when someone willing to buy meets someone
+      willing to sell --- they \emph{agree on a price}, not on value.
+    \item The \textbf{price} is just the number they agree on right now; the
+      \textbf{value} is what the asset is really worth.
+    \item A trader's job: buy when the price is \emph{below} fair value, sell
+      when it is \emph{above}. The gap is your \textbf{edge}.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{Today: we estimate fair values and trade them live
+  on the engine.}
 \end{frame}
+\note{
+  Open here. Trading sounds mysterious but it is just buying and selling at a
+  price two people agree on. Stress the difference between price and value:
+  the whole game is having a better estimate of value than the person on the
+  other side. Everything today comes back to this one idea --- find fair value,
+  then buy cheap / sell dear.
+}
 
 \begin{frame}{Buying and Selling}
-  % TODO: fill in --- bids/asks, what it means to buy vs sell, price.
+  \begin{itemize}
+    \item \textbf{Bid} --- the highest price someone is willing to \textbf{buy} at.
+    \item \textbf{Ask} (offer) --- the lowest price someone is willing to \textbf{sell} at.
+    \item The gap between them is the \textbf{spread}.
+    \item \textbf{Making a market} = quoting \emph{both} a bid and an ask, e.g.
+      ``17 at 19'' --- I'll buy at 17, sell at 19.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \begin{sqt:definition}
+    You \textbf{buy} by hitting someone's ask; you \textbf{sell} by hitting
+    their bid. A tighter spread means you are more confident in your value.
+  \end{sqt:definition}
 \end{frame}
+\note{
+  Give the concrete example: if I quote ``17 at 19'', I am telling the room I
+  will buy at 17 and sell at 19. A market maker earns the spread; a taker pays
+  it for immediacy. Tie the spread to confidence --- the surer you are of fair
+  value, the tighter you can quote without getting picked off.
+}
 
 \begin{frame}{Position and Max Position}
-  % TODO: fill in --- long/short position, PnL from position,
-  % the max position limit enforced by the engine.
+  \begin{itemize}
+    \item \textbf{Long} --- you have bought; you profit if the value goes \emph{up}.
+    \item \textbf{Short} --- you have sold; you profit if the value goes \emph{down}.
+    \item Your \textbf{position} is the net number of contracts you hold.
+    \item $\text{PnL} = \text{position} \times (\text{final value} - \text{your entry price})$.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \begin{sqt:definition}
+    The engine enforces a \textbf{max position}: a cap on how long or short you
+    can go. It bounds your risk --- you cannot bet the farm on one view.
+  \end{sqt:definition}
 \end{frame}
+\note{
+  Long = own it, short = sold it (you can sell something you don't have yet and
+  buy it back later). Position is just your net exposure. Walk the PnL formula
+  slowly with a number: bought 5 lots at 17, settles at 20, that's 5 times 3 =
+  +15. The max position is the guardrail --- it keeps one bad view from blowing
+  anyone up and forces people to actually price, not gamble.
+}
 
 \begin{frame}{How the Trading Engine Works}
-  % TODO: fill in --- how players connect, send bids/asks, see the book,
-  % how positions are liquidated at the true value at the end of a round.
+  \begin{enumerate}
+    \item Everyone connects to the same live \textbf{order book}.
+    \item You submit \textbf{bids} and \textbf{asks}; the book shows the best
+      bid and best ask to the whole room.
+    \item A \textbf{trade executes} when a bid and an ask cross at the same price.
+    \item At the end of the round the \textbf{true value is revealed} and every
+      position is \textbf{liquidated} (settled) at that value.
+  \end{enumerate}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{Your score is your PnL --- so price well, and don't
+  trade at bad levels.}
 \end{frame}
+\note{
+  Keep this practical --- most of it lands once they start playing. The one
+  thing to hammer: at settlement everything is marked to the true value, so a
+  trade only makes money if you got in at a better price than the truth. Tell
+  them not to be shy --- posting quotes is how you learn where the room thinks
+  value is.
+}
 
 
 % #####################################################################
@@ -73,17 +172,44 @@
   \begin{center}
     \vspace{0.4cm}
     % TODO: set the rolled values here (currently 3, 5, 2, 6, 4).
-    \die{3}\hfill\die{5}\hfill\die{2}\hfill\die{6}\hfill\die{4}
+    % Dice are revealed one at a time; the sum appears on the last click.
+    \only<1->{\die{3}}\hfill
+    \only<-1>{\diehidden}\only<2->{\die{5}}\hfill
+    \only<-2>{\diehidden}\only<3->{\die{2}}\hfill
+    \only<-3>{\diehidden}\only<4->{\die{6}}\hfill
+    \only<-4>{\diehidden}\only<5->{\die{4}}
 
     \vspace{0.8cm}
-    {\Large $3 + 5 + 2 + 6 + 4 = \mathbf{20}$}
+    \onslide<6->{{\Large $3 + 5 + 2 + 6 + 4 = \mathbf{20}$}}
   \end{center}
 \end{frame}
 
 \begin{frame}{Fair Value}
-  % TODO: fill in --- E[one die] = 3.5, so E[V] = 5 * 3.5 = 17.5.
-  % Discuss variance / how tight a market you can make.
+  \begin{sqt:definition}
+    \textbf{Fair value} is the expected settlement value:
+    $\mathbb{E}[V]$. It is the natural centre of your market.
+  \end{sqt:definition}
+
+  \begin{itemize}
+    \item One die: $\mathbb{E}[d] = \tfrac{1+2+\dots+6}{6} = 3.5$.
+    \item Five dice: $\mathbb{E}[V] = 5 \times 3.5 = \mathbf{17.5}$.
+    \item Spread: how wide you quote reflects your \emph{uncertainty}. One die
+      has $\mathrm{SD} \approx 1.7$; five dice $\mathrm{SD} \approx 3.8$ --- but
+      the mean is known exactly, so you can quote tightly around $17.5$.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{Quote around $17.5$. If someone sells you at $16$,
+  take it --- you have $1.5$ of edge on average.}
 \end{frame}
+\note{
+  This is the punchline of Sim 1. Fair value is just the expected value. Show
+  the two-line calculation --- 3.5 per die, times five, is 17.5. Then the key
+  intuition: because everyone can see the dice there is no hidden information,
+  so the market should converge right onto 17.5 and spreads should be tight.
+  Contrast this with the next game, where information is hidden and spreads
+  should widen. Reward anyone who bought below or sold above 17.5.
+}
 
 
 % #####################################################################
@@ -97,70 +223,140 @@
     Clues are \textbf{revealed round by round}; update your market as you learn more.
   \end{sqt:definition}
 
-  % TODO: pick the quantity, e.g. "number of X", "volume of Y".
-  \textbf{The asset:} \textcolor{sqt-question}{TODO --- state the quantity to estimate.}
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{Open a market on each. Positions liquidate at the true value.}
 \end{frame}
+\note{
+  Now the fun part --- nobody knows these values exactly, so it is pure
+  estimation. The skill is bounding: you may not know the answer, but you know
+  it is not 10 and not a million. Reveal clues one at a time and watch the
+  market move toward the truth. Encourage people to trade on every new clue,
+  not just wait for certainty --- that is how real markets absorb news.
+}
 
-\begin{frame}{Estimation Game: Reveals}
-  \textbf{Round 1}
+% ---------------------------------------------------------------------
+% Question 1: Instagram followers (MathSoc + SQT). True value = 6276.
+% ---------------------------------------------------------------------
+\begin{frame}{Estimation Game: Instagram Followers}
+  \begin{sqt:definition}
+    The asset is the \textbf{combined Instagram follower count} of
+    \texttt{@unswmathsoc} and \texttt{@sydneyquanttraders}.
+  \end{sqt:definition}
+
+  \onslide<2->{\textbf{Hint}}
   \begin{itemize}
-    \item % TODO: first clue. Players open a market and trade.
+    \item<2-> For reference, UNSW \textbf{QuantSoc} has about \textbf{2{,}185} followers.
+    \item<3-> USYD \textbf{SUMS} has roughly \textbf{2{,}648} followers.
   \end{itemize}
 
-  \onslide<2->{
-    \textbf{Round 2}
-    \begin{itemize}
-      \item % TODO: second clue. Players refine and trade.
-    \end{itemize}
-  }
+  \onslide<4->{
+    \vspace{0.2cm}
+    \begin{center}
+      \begin{columns}[c]
+        \begin{column}{0.48\textwidth}
+          \centering
+          \IfFileExists{assets/ig-mathsoc.png}{%
+            \includegraphics[width=\linewidth]{assets/ig-mathsoc.png}}{%
+            \fbox{\parbox[c][2.2cm][c]{0.9\linewidth}{\centering
+              \texttt{@unswmathsoc}\\ \textbf{3{,}418} followers}}}
+        \end{column}
+        \begin{column}{0.48\textwidth}
+          \centering
+          \IfFileExists{assets/ig-sqt.png}{%
+            \includegraphics[width=\linewidth]{assets/ig-sqt.png}}{%
+            \fbox{\parbox[c][2.2cm][c]{0.9\linewidth}{\centering
+              \texttt{@sydneyquanttraders}\\ \textbf{2{,}858} followers}}}
+        \end{column}
+      \end{columns}
+    \end{center}
 
-  \onslide<3->{
-    \textbf{Round 3}
-    \begin{itemize}
-      \item % TODO: third clue. Players refine and trade.
-    \end{itemize}
+    \vspace{0.2cm}
+    \begin{sqt:result}
+      \textbf{True value:} $3{,}418 + 2{,}858 = \mathbf{6{,}276}$.
+    \end{sqt:result}
   }
+\end{frame}
+\note{
+  Anchor them off known societies: QuantSoc around 2,185, SUMS around 2,648.
+  Two accounts of a similar size lands you near 5--6,000. Reveal the real
+  screenshots for the punchline: 3,418 plus 2,858 = 6,276. Point out how the
+  hints let a total stranger get within a few hundred --- that is the whole
+  trick of market-making questions.
+}
+
+% ---------------------------------------------------------------------
+% Question 2: integral of ln(x) from 1 to 100. True value = 361.5.
+% ---------------------------------------------------------------------
+\begin{frame}{Estimation Game: An Integral}
+  \begin{sqt:definition}
+    The asset is the value of
+    $$V = \int_{1}^{100} \ln(x)\,\mathrm{d}x.$$
+  \end{sqt:definition}
+
+  \onslide<2->{\textbf{Hint}}
+  \begin{itemize}
+    \item<2-> $\ln(x)$ grows slowly: $\ln(1) = 0$, $\ln(10) \approx 2.3$, $\ln(100) \approx 4.6$.
+    \item<3-> An antiderivative is $\int \ln(x)\,\mathrm{d}x = x\ln(x) - x$.
+  \end{itemize}
+
+  \onslide<4->{
+    \vspace{0.2cm}
+    \begin{sqt:result}
+      \textbf{True value:}
+      $\big[x\ln(x) - x\big]_{1}^{100} = 100\ln(100) - 99 \approx \mathbf{361.5}$.
+    \end{sqt:result}
+  }
+\end{frame}
+\note{
+  Even if they have never seen the antiderivative, they can bound it: the
+  average height of $\ln$ between 1 and 100 is somewhere around 3.5--4, times a
+  width of 99, so a few hundred. That estimate alone gets them close to 361.5.
+  The lesson: you rarely need the exact formula to make a good market --- a
+  rough bound plus an average is enough to quote a sensible price.
+}
+
+% ---------------------------------------------------------------------
+% Question 3: Empire State Buildings from Earth's lowest to highest point.
+% Everest 8,849 m + Challenger Deep 10,935 m = 19,784 m span.
+% ESB ~443 m tall (to tip) -> 19,784 / 443 ~ 45 buildings.
+% ---------------------------------------------------------------------
+\begin{frame}{Estimation Game: Empire State Buildings}
+  \begin{sqt:definition}
+    Stacked end to end, how many \textbf{Empire State Buildings} would it take
+    to span from the \textbf{lowest} point on Earth (Challenger Deep) to the
+    \textbf{highest} point (the summit of Mount Everest)?
+  \end{sqt:definition}
+
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{Make a market on the number of buildings. Hints on the
+  next slide.}
+\end{frame}
+
+\begin{frame}{Empire State Buildings: Hints}
+  \textbf{Hints}
+  \begin{itemize}
+    \item<1-> The lowest point, Challenger Deep, is \textbf{10{,}935 m} below sea level.
+    \item<2-> The Empire State Building has \textbf{102 floors}.
+    \item<3-> The highest point, Mount Everest, is \textbf{8{,}849 m} above sea level.
+  \end{itemize}
 
   \onslide<4->{
     \vspace{0.3cm}
     \begin{sqt:result}
-      \textbf{True value:} TODO. Liquidate all positions here.
+      \textbf{True value:} span $= 8{,}849 + 10{,}935 = 19{,}784$ m.
+      With the Empire State Building $\approx 443$ m tall,
+      $19{,}784 / 443 \approx \mathbf{45}$ buildings.
     \end{sqt:result}
   }
 \end{frame}
-
-
-% #####################################################################
-\section{Pricing Futures}
-% #####################################################################
-
-\begin{frame}{What is a Future?}
-  % TODO: fill in --- agreement now to exchange an asset at a fixed
-  % price at a fixed future date. Contrast with a spot trade.
-\end{frame}
-
-\begin{frame}{Pricing a Future}
-  % TODO: fill in --- fair future price = spot compounded to expiry.
-  % F = S * (1 + r)^t. Intuition via no-arbitrage / cost of carry.
-\end{frame}
-
-\begin{frame}{Trading Sim 3: Pricing a Basic Future}
-  \begin{sqt:definition}
-    The asset is a \textbf{future}: it settles at a spot value $S$ compounded
-    at a per-period rate $r$ over $t$ periods.
-    $$F = S \,(1+r)^{t}.$$
-  \end{sqt:definition}
-
-  \begin{itemize}
-    \item % TODO: give S, r, t. e.g. S = 100, r = 5\% per period, t = 3.
-    \item Make a market on $F$ --- this is really an exercise in estimating
-      compound interest in your head.
-  \end{itemize}
-
-  \vspace{0.3cm}
-  \textcolor{sqt-question}{Estimate $(1+r)^t$ quickly. When is the linear
-  approximation $1 + rt$ good enough?}
-\end{frame}
+\note{
+  Break it into pieces they can each estimate. Depth of the ocean plus height
+  of Everest is roughly 20 km. The Empire State Building is about 100 floors at
+  roughly 4 m a floor, so around 400 m. Twenty thousand over four hundred is
+  about 50. The exact answer is 45 --- close enough that anyone quoting 40--55
+  did great. This is the classic ``decompose an intimidating number into a few
+  guesses'' interview move.
+}
 
 
 % #####################################################################
@@ -168,11 +364,152 @@
 % #####################################################################
 
 \begin{frame}{What is an Option?}
-  % TODO: fill in --- the RIGHT but not the obligation to buy (call)
-  % at a strike K. Payoff = max(V - K, 0). Why it is never negative.
-\end{frame}
+  \begin{sqt:definition}
+    A \textbf{call option} gives you the \textbf{right, not the obligation}, to
+    buy the underlying at a fixed \textbf{strike} $K$. Payoff at expiry:
+    $$\text{payoff} = \max(V - K,\; 0).$$
+  \end{sqt:definition}
 
-\begin{frame}{Trading Sim 4: Option on a d6, Strike 3}
+  \begin{itemize}
+    \item If $V > K$ you exercise and gain $V - K$; if $V \le K$ you walk away.
+    \item So the payoff is \textbf{never negative} --- that is what you pay a
+      \textbf{premium} for up front.
+    \item Fair price $= \mathbb{E}[\max(V - K, 0)]$: the average payoff over all
+      outcomes.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{An option is a bet on the \emph{upside} only. How
+  much is that one-sided bet worth?}
+\end{frame}
+\note{
+  The word ``option'' is literal --- you have the option, not the obligation, to
+  buy. That one-sidedness is everything: you keep the good outcomes and drop the
+  bad ones, so the payoff can never go below zero. Because you can't lose at
+  expiry, you have to pay for it up front --- the premium. Pricing the option is
+  just averaging that max payoff over the distribution, which is exactly what
+  the next two sims make them do by hand.
+}
+
+% ---------------------------------------------------------------------
+% Payoff diagrams and how options combine.
+% ---------------------------------------------------------------------
+\begin{frame}{Payoff Diagrams}
+  A \textbf{payoff diagram} plots what an option pays at expiry against the
+  underlying price $S$. The two building blocks:
+
+  \vspace{0.2cm}
+  \begin{columns}[t]
+    \begin{column}{0.5\textwidth}
+      \centering
+      \payoff{
+        \draw[very thick,sqt-question] (0,0) -- (3,0) -- (6,3);
+        \draw[dashed,gray!50] (3,0) -- (3,-0.2);
+        \node[below] at (3,-0.2) {\scriptsize $K$};
+      }
+
+      \textbf{Long call} $= \max(S-K,0)$
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \payoff{
+        \draw[very thick,orange!85!black] (0,3) -- (3,0) -- (6,0);
+        \draw[dashed,gray!50] (3,0) -- (3,-0.2);
+        \node[below] at (3,-0.2) {\scriptsize $K$};
+      }
+
+      \textbf{Long put} $= \max(K-S,0)$
+    \end{column}
+  \end{columns}
+
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{Selling an option flips its diagram about the
+  $S$-axis: your payoff is the negative.}
+\end{frame}
+\note{
+  A payoff diagram is just a picture of what you get at expiry for each possible
+  price. Two shapes to memorise: the call is flat then ramps up, the put ramps
+  down then flat. If you sell instead of buy, flip the picture upside down.
+  These four pictures --- long/short call, long/short put --- are the Lego bricks
+  for the next slide.
+}
+
+\begin{frame}{Combining Options: the Payoffs Add}
+  Hold several options at once and their payoff diagrams simply \textbf{add}.
+  A call plus a put at the same strike gives a \textbf{straddle}:
+
+  \vspace{0.4cm}
+  \begin{center}
+  \resizebox{0.98\textwidth}{!}{%
+    \begin{tabular}{c@{\;}c@{\;}c@{\;}c@{\;}c}
+      \payoff{\draw[very thick,sqt-question] (0,0) -- (3,0) -- (6,3);}
+      & \Large $+$ &
+      \payoff{\draw[very thick,orange!85!black] (0,3) -- (3,0) -- (6,0);}
+      & \Large $=$ &
+      \payoff{\draw[very thick,violet] (0,3) -- (3,0) -- (6,3);} \\[0.2cm]
+      long call & & long put & & \textbf{straddle}
+    \end{tabular}}
+  \end{center}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{A straddle pays off when $S$ moves far in
+  \emph{either} direction --- a bet on volatility, not on direction.}
+\end{frame}
+\note{
+  The magic fact: to combine options you just add their payoff lines vertically.
+  Call plus put at the same strike gives a V --- the straddle. Read what the V
+  means: you make money if the price moves a lot in either direction, and lose
+  the premium if it sits still. So a straddle is a bet on \emph{how much} it
+  moves, not \emph{which way}. That's your first taste of trading volatility.
+}
+
+\begin{frame}{A Zoo of Structures}
+  Mixing calls and puts at different strikes builds any shape you like:
+
+  \vspace{0.4cm}
+  \begin{center}
+  \resizebox{\textwidth}{!}{%
+  \begin{tabular}{cccc}
+    \payoff{
+      \draw[very thick,teal] (0,0) -- (2,0) -- (4,2) -- (6,2);
+      \node[below] at (2,-0.2) {\scriptsize $K_1$};
+      \node[below] at (4,-0.2) {\scriptsize $K_2$};
+    }
+    &
+    \payoff{
+      \draw[very thick,violet] (0,2) -- (2,0) -- (4,0) -- (6,2);
+      \node[below] at (2,-0.2) {\scriptsize $K_1$};
+      \node[below] at (4,-0.2) {\scriptsize $K_2$};
+    }
+    &
+    \payoff{
+      \draw[very thick,red!70!black] (0,0) -- (1,0) -- (3,2) -- (5,0) -- (6,0);
+      \node[below] at (3,-0.2) {\scriptsize $K_2$};
+    }
+    &
+    \payoff{
+      \draw[very thick,sqt-question] (0,3) -- (3,0) -- (6,3);
+      \node[below] at (3,-0.2) {\scriptsize $K$};
+    }
+    \\[0.15cm]
+    \textbf{Bull call spread} & \textbf{Strangle} & \textbf{Butterfly} & \textbf{Straddle} \\
+    {\scriptsize long call $K_1$,} & {\scriptsize long put $K_1$,} &
+    {\scriptsize long $K_1$, short 2$\times K_2$,} & {\scriptsize long call} \\
+    {\scriptsize short call $K_2$} & {\scriptsize long call $K_2$} &
+    {\scriptsize long $K_3$} & {\scriptsize \& put at $K$} \\
+  \end{tabular}}
+  \end{center}
+\end{frame}
+\note{
+  Don't drown them in names --- the point is that a handful of calls and puts can
+  build essentially any shape. A spread caps your bet between two strikes; a
+  butterfly pays most if the price lands on a target; a strangle is a cheaper
+  straddle. Traders think in these shapes because each one expresses a specific
+  view --- direction, a target, or volatility. One line to remember: pick the
+  payoff you want, then buy the options that add up to it.
+}
+
+\begin{frame}{Trading Sim 3: Option on a d6, Strike 3}
   \begin{sqt:definition}
     A single die is rolled, value $d \sim \mathrm{Unif}\{1,\dots,6\}$.
     The asset is a \textbf{call option} with strike $K = 3$:
@@ -193,8 +530,14 @@
   \textcolor{sqt-question}{What is the fair price of this option?}
   % Fair value = (0+0+0+1+2+3)/6 = 1.
 \end{frame}
+\note{
+  First option they price by hand. Walk the payoff row: 0,0,0,1,2,3. Average it
+  --- that's 6 over 6 = 1. So the fair price is exactly 1. Notice it is worth
+  something even though half the time it pays zero: the upside outcomes carry
+  all the value. That is the whole idea of an option in one number.
+}
 
-\begin{frame}{Trading Sim 5: Option on Sum of Three d6, Strike 11}
+\begin{frame}{Trading Sim 4: Option on Sum of Three d6, Strike 11}
   \begin{sqt:definition}
     Three dice are rolled, $S = d_1 + d_2 + d_3$.
     The asset is a \textbf{call option} with strike $K = 11$:
@@ -211,6 +554,45 @@
   distribution of the sum of three dice.}
   % E[S] = 10.5; need the payoff distribution above the strike.
 \end{frame}
+\note{
+  Harder because the sum of three dice is bell-shaped, not flat. The mean is
+  10.5, just below the strike of 11, so at first glance the option looks nearly
+  worthless --- but it isn't, because the times the sum lands at 12, 13, 14+ pay
+  real money. That gap between ``average is below strike'' and ``still worth
+  something'' is exactly why out-of-the-money options have value. Let the room
+  fight over the price, then reveal it.
+}
+
+\begin{frame}{Trading Sim 5: Straddle on a d6, Strike 3}
+  \begin{sqt:definition}
+    A single die is rolled, $d \sim \mathrm{Unif}\{1,\dots,6\}$.
+    The asset is a \textbf{straddle} at strike $K = 3$ --- a call plus a put:
+    $$\text{payoff} = \max(d-3,0) + \max(3-d,0) = |d - 3|.$$
+  \end{sqt:definition}
+
+  \begin{center}
+    \diehidden
+
+    \vspace{0.4cm}
+    \begin{tabular}{c|cccccc}
+      $d$ & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+      $|d-3|$ & 2 & 1 & 0 & 1 & 2 & 3 \\
+    \end{tabular}
+  \end{center}
+
+  \vspace{0.3cm}
+  \textcolor{sqt-question}{Fair price of the straddle? Compare it to pricing
+  the call and the put separately.}
+  % Fair value = (2+1+0+1+2+3)/6 = 9/6 = 1.5.
+\end{frame}
+\note{
+  Payoff row is 2,1,0,1,2,3; average is 9 over 6 = 1.5. Now the punchline that
+  ties the section together: the call was worth 1 and the put is worth 0.5, and
+  1 + 0.5 = 1.5. Pricing the straddle whole gives the same answer as pricing the
+  pieces and adding --- exactly like the payoff diagrams added. Combining options
+  adds their prices too. Great place to hand back to fair value = expected value
+  before the wrap-up.
+}
 
 
 % #####################################################################
@@ -218,8 +600,34 @@
 % #####################################################################
 
 \begin{frame}{Wrap Up}
-  % TODO: fill in --- recap of fair value, spreads, futures, options,
-  % and takeaways for trading interviews.
+  \textbf{What we did today:}
+  \begin{itemize}
+    \item \textbf{Fair value} is expected value --- centre your market on it.
+    \item \textbf{Spreads} price your uncertainty; hidden information widens them.
+    \item \textbf{Estimation} under uncertainty --- update your market as clues land.
+    \item \textbf{Options} price one-sided payoffs, $\mathbb{E}[\max(\cdot,0)]$,
+      and \textbf{combine} into any payoff shape you like.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \begin{sqt:definition}
+    \textbf{Takeaways for interviews:} think in expected value, quote a number
+    and a width, and re-price the instant new information arrives.
+  \end{sqt:definition}
+
+  \vspace{0.2cm}
+  \begin{center}
+    \textcolor{sqt-question}{\large Thanks for trading with us! Questions?}
+  \end{center}
 \end{frame}
+\note{
+  Land the plane by tying the games together: every single asset today was
+  priced the same way --- expected value --- whether it was dice, followers, an
+  integral, or an option. Spreads were about how confident you were. Options
+  just added the max. For interviews: they will ask you to make a market on
+  something silly (golf balls in a bus); the move is always the same --- state
+  a fair value, quote a width around it, and update fast. Thank them and open
+  the floor.
+}
 
 \end{document}
