@@ -360,43 +360,61 @@
 
 
 % #####################################################################
-\section{Pricing Options}
+\section{Options}
 % #####################################################################
 
 \begin{frame}{What is an Option?}
   \begin{sqt:definition}
-    A \textbf{call option} gives you the \textbf{right, not the obligation}, to
-    buy the underlying at a fixed \textbf{strike} $K$. Payoff at expiry:
-    $$\text{payoff} = \max(V - K,\; 0).$$
+    An \textbf{option} is a contract whose value depends on some underlying
+    asset, but where one side has a \textbf{choice} at expiry.
   \end{sqt:definition}
 
   \begin{itemize}
-    \item If $V > K$ you exercise and gain $V - K$; if $V \le K$ you walk away.
-    \item So the payoff is \textbf{never negative} --- that is what you pay a
-      \textbf{premium} for up front.
-    \item Fair price $= \mathbb{E}[\max(V - K, 0)]$: the average payoff over all
-      outcomes.
+    \item ``Right, not obligation'' is the key idea:
+      if exercise is unfavourable for you, you simply do nothing.
+    \item The payoff is some function of the final underlying value:
+      $g(S_T)$.
+    \item Fair price means averaging that payoff across all possible outcomes.
   \end{itemize}
 
   \vspace{0.2cm}
-  \textcolor{sqt-question}{An option is a bet on the \emph{upside} only. How
-  much is that one-sided bet worth?}
+  \textcolor{sqt-question}{An option gives you a choice. How much is that
+  choice worth?}
 \end{frame}
 \note{
-  The word ``option'' is literal --- you have the option, not the obligation, to
-  buy. That one-sidedness is everything: you keep the good outcomes and drop the
-  bad ones, so the payoff can never go below zero. Because you can't lose at
-  expiry, you have to pay for it up front --- the premium. Pricing the option is
-  just averaging that max payoff over the distribution, which is exactly what
-  the next two sims make them do by hand.
+  Start from the literal meaning of the word option. It is a choice. You are
+  not forced to trade at expiry; you only exercise when it helps you. That
+  asymmetry is the entire product. Keep this slide generic: payoff is just some
+  function of the final price, and pricing means averaging that function over
+  the distribution of outcomes.
 }
 
-% ---------------------------------------------------------------------
-% Payoff diagrams and how options combine.
-% ---------------------------------------------------------------------
-\begin{frame}{Payoff Diagrams}
-  A \textbf{payoff diagram} plots what an option pays at expiry against the
-  underlying price $S$. The two building blocks:
+\begin{frame}{Pricing an Option from the Underlying Distribution}
+  \vspace{0.2cm}
+  \begin{sqt:definition}
+    \[
+      \text{Option price}
+      = e^{-rT}\,\mathbb{E}\big[g(S_T)\big]
+      = e^{-rT}\int_{-\infty}^{\infty} g(s)\, f(s)\, ds
+    \]
+  \end{sqt:definition}
+
+  \begin{itemize}
+    \item $S_T$: underlying price at expiry time $T$.
+    \item $g(S_T)$: option payoff as a function of the expiry price.
+    \item $f(s)$: probability density of the underlying at expiry.
+    \item $r$: interest rate used for discounting.
+    \item $T$: time to expiry.
+  \end{itemize}
+\end{frame}
+\note{
+  Keep this slide formal and compact. Define each term clearly, and mention
+  that the key structure is discounted expected payoff under the expiry
+  distribution.
+}
+
+\begin{frame}{Calls and Puts: Definition and Payoff}
+  At expiry, the two basic option payoffs are:
 
   \vspace{0.2cm}
   \begin{columns}[t]
@@ -409,6 +427,9 @@
       }
 
       \textbf{Long call} $= \max(S-K,0)$
+
+      \vspace{0.15cm}
+      Exercise if $S>K$.
     \end{column}
     \begin{column}{0.5\textwidth}
       \centering
@@ -419,97 +440,63 @@
       }
 
       \textbf{Long put} $= \max(K-S,0)$
+
+      \vspace{0.15cm}
+      Exercise if $S<K$.
     \end{column}
   \end{columns}
 
   \vspace{0.3cm}
-  \textcolor{sqt-question}{Selling an option flips its diagram about the
-  $S$-axis: your payoff is the negative.}
+  \begin{itemize}
+    \item A long call benefits when the underlying settles at a
+      \textbf{higher} price.
+    \item A long put benefits when the underlying settles at a
+      \textbf{lower} price.
+    \item Selling the option just flips the payoff sign.
+  \end{itemize}
 \end{frame}
 \note{
-  A payoff diagram is just a picture of what you get at expiry for each possible
-  price. Two shapes to memorise: the call is flat then ramps up, the put ramps
-  down then flat. If you sell instead of buy, flip the picture upside down.
-  These four pictures --- long/short call, long/short put --- are the Lego bricks
-  for the next slide.
+  This is the one slide where they should leave knowing the two canonical
+  pictures. Call: flat then up. Put: down then flat. Also say out loud that
+  the payoff diagram is at expiry and does not include the initial premium.
 }
 
-\begin{frame}{Combining Options: the Payoffs Add}
-  Hold several options at once and their payoff diagrams simply \textbf{add}.
-  A call plus a put at the same strike gives a \textbf{straddle}:
-
-  \vspace{0.4cm}
-  \begin{center}
-  \resizebox{0.98\textwidth}{!}{%
-    \begin{tabular}{c@{\;}c@{\;}c@{\;}c@{\;}c}
-      \payoff{\draw[very thick,sqt-question] (0,0) -- (3,0) -- (6,3);}
-      & \Large $+$ &
-      \payoff{\draw[very thick,orange!85!black] (0,3) -- (3,0) -- (6,0);}
-      & \Large $=$ &
-      \payoff{\draw[very thick,violet] (0,3) -- (3,0) -- (6,3);} \\[0.2cm]
-      long call & & long put & & \textbf{straddle}
-    \end{tabular}}
-  \end{center}
-
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{A straddle pays off when $S$ moves far in
-  \emph{either} direction --- a bet on volatility, not on direction.}
-\end{frame}
-\note{
-  The magic fact: to combine options you just add their payoff lines vertically.
-  Call plus put at the same strike gives a V --- the straddle. Read what the V
-  means: you make money if the price moves a lot in either direction, and lose
-  the premium if it sits still. So a straddle is a bet on \emph{how much} it
-  moves, not \emph{which way}. That's your first taste of trading volatility.
-}
-
-\begin{frame}{A Zoo of Structures}
-  Mixing calls and puts at different strikes builds any shape you like:
-
-  \vspace{0.4cm}
+\begin{frame}{Options Let You Express Views on the Distribution}
   \begin{center}
   \resizebox{\textwidth}{!}{%
-  \begin{tabular}{cccc}
-    \payoff{
-      \draw[very thick,teal] (0,0) -- (2,0) -- (4,2) -- (6,2);
-      \node[below] at (2,-0.2) {\scriptsize $K_1$};
-      \node[below] at (4,-0.2) {\scriptsize $K_2$};
-    }
-    &
-    \payoff{
-      \draw[very thick,violet] (0,2) -- (2,0) -- (4,0) -- (6,2);
-      \node[below] at (2,-0.2) {\scriptsize $K_1$};
-      \node[below] at (4,-0.2) {\scriptsize $K_2$};
-    }
-    &
-    \payoff{
-      \draw[very thick,red!70!black] (0,0) -- (1,0) -- (3,2) -- (5,0) -- (6,0);
-      \node[below] at (3,-0.2) {\scriptsize $K_2$};
-    }
-    &
-    \payoff{
-      \draw[very thick,sqt-question] (0,3) -- (3,0) -- (6,3);
-      \node[below] at (3,-0.2) {\scriptsize $K$};
-    }
-    \\[0.15cm]
-    \textbf{Bull call spread} & \textbf{Strangle} & \textbf{Butterfly} & \textbf{Straddle} \\
-    {\scriptsize long call $K_1$,} & {\scriptsize long put $K_1$,} &
-    {\scriptsize long $K_1$, short 2$\times K_2$,} & {\scriptsize long call} \\
-    {\scriptsize short call $K_2$} & {\scriptsize long call $K_2$} &
-    {\scriptsize long $K_3$} & {\scriptsize \& put at $K$} \\
-  \end{tabular}}
+    \begin{tabular}{ccc}
+      \payoff{
+        \draw[very thick,violet] (0,3) -- (3,0) -- (6,3);
+        \node[below] at (3,-0.2) {\scriptsize $K$};
+      }
+      &
+      \payoff{
+        \draw[very thick,teal] (0,1.8) -- (2,0) -- (4,0) -- (6,-1.8);
+        \node[below] at (2,-0.2) {\scriptsize $K_{\text{put}}$};
+        \node[below] at (4,-0.2) {\scriptsize $K_{\text{call}}$};
+      }
+      &
+      \payoff{
+        \draw[very thick,red!70!black] (0,0) -- (1.5,0) -- (3,2.2) -- (4.5,0) -- (6,0);
+        \node[below] at (1.5,-0.2) {\scriptsize $K_1$};
+        \node[below] at (3,-0.2) {\scriptsize $K_2$};
+        \node[below] at (4.5,-0.2) {\scriptsize $K_3$};
+      }
+      \\[0.15cm]
+      \textbf{Straddle}
+      &
+      \textbf{Risk Reversal}
+      &
+      \textbf{Butterfly}
+    \end{tabular}}
   \end{center}
 \end{frame}
 \note{
-  Don't drown them in names --- the point is that a handful of calls and puts can
-  build essentially any shape. A spread caps your bet between two strikes; a
-  butterfly pays most if the price lands on a target; a strangle is a cheaper
-  straddle. Traders think in these shapes because each one expresses a specific
-  view --- direction, a target, or volatility. One line to remember: pick the
-  payoff you want, then buy the options that add up to it.
+  Use this slide as a live prompt. Quiz the room on each shape first, then
+  explain the structure and the view it expresses.
 }
 
-\begin{frame}{Trading Sim 3: Option on a d6, Strike 3}
+\begin{frame}{Call Option Pricing Example}
   \begin{sqt:definition}
     A single die is rolled, value $d \sim \mathrm{Unif}\{1,\dots,6\}$.
     The asset is a \textbf{call option} with strike $K = 3$:
@@ -537,61 +524,257 @@
   all the value. That is the whole idea of an option in one number.
 }
 
-\begin{frame}{Trading Sim 4: Option on Sum of Three d6, Strike 11}
+\section{Trading Sim 3}
+
+\begin{frame}{Trading Sim 3}
   \begin{sqt:definition}
-    Three dice are rolled, $S = d_1 + d_2 + d_3$.
-    The asset is a \textbf{call option} with strike $K = 11$:
-    $$\text{payoff} = \max(S - 11,\; 0).$$
+    Three independent random integers are generated:
+    \[
+      X_1,X_2,X_3 \sim \operatorname{Unif}\{0,1,\ldots,1000\}.
+    \]
+
+    The underlying is the minimum:
+    \[
+      S=\min(X_1,X_2,X_3).
+    \]
   \end{sqt:definition}
 
-  \begin{center}
-    \die{4}\hspace{0.6cm}\die{6}\hspace{0.6cm}\die{3}
-    % TODO: set / hide dice as appropriate for the sim.
-  \end{center}
+  \begin{itemize}
+    \item The traded contract is a \textbf{put option} with strike $K=200$.
+    \item Final settlement value:
+      \[
+        (200-S)^+ = \max(200-S,0).
+      \]
+    \item The put pays when at least one generated number is sufficiently low.
+  \end{itemize}
 
-  \vspace{0.3cm}
-  \textcolor{sqt-question}{Fair price? $\mathbb{E}[\max(S-11,0)]$ over the
-  distribution of the sum of three dice.}
-  % E[S] = 10.5; need the payoff distribution above the strike.
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{Make an initial market before any numbers are revealed.}
 \end{frame}
 \note{
-  Harder because the sum of three dice is bell-shaped, not flat. The mean is
-  10.5, just below the strike of 11, so at first glance the option looks nearly
-  worthless --- but it isn't, because the times the sum lands at 12, 13, 14+ pay
-  real money. That gap between ``average is below strike'' and ``still worth
-  something'' is exactly why out-of-the-money options have value. Let the room
-  fight over the price, then reveal it.
+  The key feature is that the underlying is the worst of three draws, not the
+  average or the sum. That makes downside outcomes much more relevant. Let them
+  feel that intuition before you say anything quantitative.
 }
 
-\begin{frame}{Trading Sim 5: Straddle on a d6, Strike 3}
-  \begin{sqt:definition}
-    A single die is rolled, $d \sim \mathrm{Unif}\{1,\dots,6\}$.
-    The asset is a \textbf{straddle} at strike $K = 3$ --- a call plus a put:
-    $$\text{payoff} = \max(d-3,0) + \max(3-d,0) = |d - 3|.$$
-  \end{sqt:definition}
-
+\begin{frame}{Trading Sim 3}
   \begin{center}
-    \diehidden
-
-    \vspace{0.4cm}
-    \begin{tabular}{c|cccccc}
-      $d$ & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
-      $|d-3|$ & 2 & 1 & 0 & 1 & 2 & 3 \\
-    \end{tabular}
+    \[
+      X_1=734,\qquad X_2=?,\qquad X_3=?
+    \]
   \end{center}
 
-  \vspace{0.3cm}
-  \textcolor{sqt-question}{Fair price of the straddle? Compare it to pricing
-  the call and the put separately.}
-  % Fair value = (2+1+0+1+2+3)/6 = 9/6 = 1.5.
+  \begin{itemize}
+    \item One number is now known.
+    \item The other two numbers still determine whether the minimum falls below $200$.
+    \item Re-price the \textbf{200-strike put}.
+  \end{itemize}
 \end{frame}
 \note{
-  Payoff row is 2,1,0,1,2,3; average is 9 over 6 = 1.5. Now the punchline that
-  ties the section together: the call was worth 1 and the put is worth 0.5, and
-  1 + 0.5 = 1.5. Pricing the straddle whole gives the same answer as pricing the
-  pieces and adding --- exactly like the payoff diagrams added. Combining options
-  adds their prices too. Great place to hand back to fair value = expected value
-  before the wrap-up.
+  A high first number does not help much because the minimum can still be driven
+  by either hidden draw. So the downside risk is still very alive.
+}
+
+\begin{frame}{Trading Sim 3}
+  \begin{center}
+    \[
+      X_1=734,\qquad X_2=168,\qquad X_3=?
+    \]
+
+    \vspace{0.2cm}
+    Current minimum:
+    \[
+      \min(734,168)=168
+    \]
+
+    \vspace{0.2cm}
+    Guaranteed payoff so far:
+    \[
+      200-168=32
+    \]
+  \end{center}
+\end{frame}
+\note{
+  Once a number below strike appears, the option has locked in intrinsic value.
+  The final draw cannot hurt the holder anymore; it can only keep the payoff at
+  32 or make it larger by setting a new, even lower minimum.
+}
+
+\begin{frame}{Trading Sim 3}
+  \begin{center}
+    \[
+      X_1=734,\qquad X_2=168,\qquad X_3=491
+    \]
+
+    \vspace{0.2cm}
+    \[
+      S=\min(734,168,491)=168
+    \]
+
+    \vspace{0.3cm}
+    {\Large
+    \[
+      \text{Put payoff}=\max(200-168,0)=32
+    \]}
+  \end{center}
+\end{frame}
+\note{
+  Settle it cleanly. The third draw was not low enough to change the minimum,
+  so the guaranteed payoff from the previous slide becomes the final payoff.
+}
+
+\begin{frame}{Trading Sim 3}
+  \begin{sqt:definition}
+    Continuous approximation:
+    \[
+      \mathbb P(S>x)=\left(\frac{1000-x}{1000}\right)^3
+    \]
+  \end{sqt:definition}
+
+  \[
+    \mathbb E[(200-S)^+]
+    =
+    \int_0^{200}
+    \left[
+      1-\left(1-\frac{x}{1000}\right)^3
+    \right]dx
+    = 52.8
+  \]
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{Initial theoretical fair value: approximately 53.}
+\end{frame}
+\note{
+  This is where you can give the fair value. A clean continuous approximation
+  is to treat the draws as i.i.d. uniform on [0,1000]. Then
+  $\mathbb{P}(S>x)=((1000-x)/1000)^3$, and integrating the put payoff over
+  $x\in[0,200]$ gives about 52.8. The important intuition is that taking the
+  minimum of three draws pushes probability mass toward low outcomes, which is
+  exactly what makes the put valuable.
+}
+
+\section{Trading Sim 4}
+
+\begin{frame}{Trading Sim 4}
+  \begin{sqt:definition}
+    A fair coin is flipped \textbf{before} the cards are drawn. Then two cards
+    $X$ and $Y$ are drawn \textbf{without replacement} from
+    $\{1,2,\dots,14\}$.
+  \end{sqt:definition}
+
+  \[
+    S=
+    \begin{cases}
+      XY, & \text{if Heads},\\
+      X+Y, & \text{if Tails.}
+    \end{cases}
+  \]
+
+  \begin{itemize}
+    \item The underlying value is $S$.
+    \item The traded contract is a \textbf{25-strike straddle}.
+    \item Final settlement value: $\lvert S-25\rvert$.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{Make an initial market before any information is revealed.}
+\end{frame}
+\note{
+  Set up the game cleanly. There are two sources of uncertainty: the rule and
+  the cards. Stress that the coin is flipped first but hidden, so the room has
+  to price over a mixture distribution from the start.
+}
+
+\begin{frame}{Trading Sim 4}
+  \begin{center}
+    \[
+      X=8,\qquad Y=?,\qquad \text{rule}=?
+    \]
+  \end{center}
+
+  \begin{itemize}
+    \item One card is now known.
+    \item The rule and the second card are still hidden.
+    \item Re-price the \textbf{25-strike straddle}.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{How does learning $X=8$ change your market?}
+\end{frame}
+\note{
+  They still face a mixture of addition and multiplication, but the first card
+  starts to anchor the range of outcomes. Let them talk through what values are
+  now possible under each rule.
+}
+
+\begin{frame}{Trading Sim 4}
+  \begin{center}
+    \[
+      X=8,\qquad Y=?,\qquad \text{Heads: } S=XY
+    \]
+  \end{center}
+
+  \begin{itemize}
+    \item Multiplication can create much \textbf{larger} outcomes.
+    \item It also creates a more \textbf{dispersed} distribution of $S$.
+    \item Addition would have produced a much \textbf{narrower} range.
+  \end{itemize}
+
+  \vspace{0.2cm}
+  \textcolor{sqt-question}{Update your market again with the rule now known.}
+\end{frame}
+\note{
+  This is the key information shock. Same first card, but knowing the rule
+  changes the whole shape of the distribution. That is exactly what the straddle
+  should respond to.
+}
+
+\begin{frame}{Trading Sim 4}
+  \begin{center}
+    \[
+      X=8,\qquad Y=12,\qquad \text{Heads: } S=XY
+    \]
+
+    \vspace{0.2cm}
+    \[
+      S = 8\times 12 = 96
+    \]
+
+    \vspace{0.2cm}
+    \[
+      \text{Payoff} = |96-25| = 71
+    \]
+  \end{center}
+\end{frame}
+\note{
+  Reveal the second card, compute the underlying, then settle the straddle.
+  This example lands hard because multiplication pushes the final value far from
+  the strike.
+}
+
+\begin{frame}{Trading Sim 4}
+  \begin{sqt:definition}
+    Exact fair value:
+    \[
+      \mathbb{E}[|S-25|]
+      =
+      \frac{1}{2\binom{14}{2}}
+      \sum_{1\le x<y\le 14}
+      \Bigl(|xy-25| + |x+y-25|\Bigr)
+      \approx 24.01
+    \]
+  \end{sqt:definition}
+
+  \begin{itemize}
+    \item Choose the coin outcome: Heads or Tails, each with probability $\frac12$.
+    \item Choose the two cards uniformly without replacement from $\{1,\dots,14\}$.
+    \item Compute the straddle payoff for each case and average them all.
+  \end{itemize}
+\end{frame}
+\note{
+  Keep this one discrete and exact. There are $\binom{14}{2}$ unordered card
+  pairs, and for each pair there are two equally likely rules. So the true fair
+  value is just the average payoff across all those equally likely outcomes.
 }
 
 
@@ -606,7 +789,7 @@
     \item \textbf{Spreads} price your uncertainty; hidden information widens them.
     \item \textbf{Estimation} under uncertainty --- update your market as clues land.
     \item \textbf{Options} price one-sided payoffs, $\mathbb{E}[\max(\cdot,0)]$,
-      and \textbf{combine} into any payoff shape you like.
+      and let you trade the \textbf{shape of the distribution}.
   \end{itemize}
 
   \vspace{0.2cm}
