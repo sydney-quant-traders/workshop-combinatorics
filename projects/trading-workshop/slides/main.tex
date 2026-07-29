@@ -54,6 +54,19 @@
 % #####################################################################
 % Short intro (a condensed version of Intro to Quant). Leave empty for now.
 
+\begin{frame}{Why?}
+  \begin{itemize}
+    \item You'll see these questions in some interviews.
+    \item Games like these are played in trading programs.
+    \item Fun in general.
+  \end{itemize}
+\end{frame}
+\note{
+  Quick framing before any theory. Three reasons: these games show up in quant
+  trading interviews, trading firms use them to train, and they are fun. Keep it
+  short and get them playing.
+}
+
 \begin{frame}{What is Trading?}
   \begin{sqt:definition}
     \textbf{Trading} is exchanging an asset for an agreed price. Every trade
@@ -62,32 +75,29 @@
 
   \begin{itemize}
     \item A trade happens only when someone willing to buy meets someone
-      willing to sell --- they \emph{agree on a price}, not on value.
+      willing to sell, they \emph{agree on a price}, not on value.
     \item The \textbf{price} is just the number they agree on right now; the
       \textbf{value} is what the asset is really worth.
     \item A trader's job: buy when the price is \emph{below} fair value, sell
       when it is \emph{above}. The gap is your \textbf{edge}.
   \end{itemize}
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{Today: we estimate fair values and trade them live
-  on the engine.}
 \end{frame}
 \note{
   Open here. Trading sounds mysterious but it is just buying and selling at a
   price two people agree on. Stress the difference between price and value:
   the whole game is having a better estimate of value than the person on the
-  other side. Everything today comes back to this one idea --- find fair value,
+  other side. Everything today comes back to this one idea, find fair value,
   then buy cheap / sell dear.
 }
 
 \begin{frame}{Buying and Selling}
   \begin{itemize}
-    \item \textbf{Bid} --- the highest price someone is willing to \textbf{buy} at.
-    \item \textbf{Ask} (offer) --- the lowest price someone is willing to \textbf{sell} at.
+    \item \textbf{Bid}, the highest price someone is willing to \textbf{buy} at.
+    \item \textbf{Ask} (offer), the lowest price someone is willing to \textbf{sell} at.
     \item The gap between them is the \textbf{spread}.
     \item \textbf{Making a market} = quoting \emph{both} a bid and an ask, e.g.
-      ``17 at 19'' --- I'll buy at 17, sell at 19.
+      ``17 at 19'', I'll buy at 17, sell at 19.
   \end{itemize}
 
   \vspace{0.2cm}
@@ -99,14 +109,14 @@
 \note{
   Give the concrete example: if I quote ``17 at 19'', I am telling the room I
   will buy at 17 and sell at 19. A market maker earns the spread; a taker pays
-  it for immediacy. Tie the spread to confidence --- the surer you are of fair
+  it for immediacy. Tie the spread to confidence, the surer you are of fair
   value, the tighter you can quote without getting picked off.
 }
 
 \begin{frame}{Position and Max Position}
   \begin{itemize}
-    \item \textbf{Long} --- you have bought; you profit if the value goes \emph{up}.
-    \item \textbf{Short} --- you have sold; you profit if the value goes \emph{down}.
+    \item \textbf{Long}, you have bought; you profit if the value goes \emph{up}.
+    \item \textbf{Short}, you have sold; you profit if the value goes \emph{down}.
     \item Your \textbf{position} is the net number of contracts you hold.
     \item $\text{PnL} = \text{position} \times (\text{final value} - \text{your entry price})$.
   \end{itemize}
@@ -114,14 +124,14 @@
   \vspace{0.2cm}
   \begin{sqt:definition}
     The engine enforces a \textbf{max position}: a cap on how long or short you
-    can go. It bounds your risk --- you cannot bet the farm on one view.
+    can go. It bounds your risk, you cannot bet the farm on one view.
   \end{sqt:definition}
 \end{frame}
 \note{
   Long = own it, short = sold it (you can sell something you don't have yet and
   buy it back later). Position is just your net exposure. Walk the PnL formula
   slowly with a number: bought 5 lots at 17, settles at 20, that's 5 times 3 =
-  +15. The max position is the guardrail --- it keeps one bad view from blowing
+  +15. The max position is the guardrail, it keeps one bad view from blowing
   anyone up and forces people to actually price, not gamble.
 }
 
@@ -140,12 +150,10 @@
 
   \begin{itemize}
     \item Make a market on $V$ in the trading engine.
-    \item Everyone can see the dice --- there is no hidden information yet.
+    \item Everyone can see the dice, there is no hidden information yet.
     \item At the end, positions are liquidated at the true $V$.
   \end{itemize}
 
-  \vspace{0.3cm}
-  \textcolor{sqt-question}{What is a fair value for $V$? How wide should your market be?}
 \end{frame}
 
 \begin{frame}{The Five Dice}
@@ -174,17 +182,14 @@
     \item One die: $\mathbb{E}[d] = \tfrac{1+2+\dots+6}{6} = 3.5$.
     \item Five dice: $\mathbb{E}[V] = 5 \times 3.5 = \mathbf{17.5}$.
     \item Spread: how wide you quote reflects your \emph{uncertainty}. One die
-      has $\mathrm{SD} \approx 1.7$; five dice $\mathrm{SD} \approx 3.8$ --- but
+      has $\mathrm{SD} \approx 1.7$; five dice $\mathrm{SD} \approx 3.8$, but
       the mean is known exactly, so you can quote tightly around $17.5$.
   \end{itemize}
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{Quote around $17.5$. If someone sells you at $16$,
-  take it --- you have $1.5$ of edge on average.}
 \end{frame}
 \note{
   This is the punchline of Sim 1. Fair value is just the expected value. Show
-  the two-line calculation --- 3.5 per die, times five, is 17.5. Then the key
+  the two-line calculation, 3.5 per die, times five, is 17.5. Then the key
   intuition: because everyone can see the dice there is no hidden information,
   so the market should converge right onto 17.5 and spreads should be tight.
   Contrast this with the next game, where information is hidden and spreads
@@ -203,15 +208,13 @@
     Clues are \textbf{revealed round by round}; update your market as you learn more.
   \end{sqt:definition}
 
-  \vspace{0.3cm}
-  \textcolor{sqt-question}{Open a market on each. Positions liquidate at the true value.}
 \end{frame}
 \note{
-  Now the fun part --- nobody knows these values exactly, so it is pure
+  Now the fun part, nobody knows these values exactly, so it is pure
   estimation. The skill is bounding: you may not know the answer, but you know
   it is not 10 and not a million. Reveal clues one at a time and watch the
   market move toward the truth. Encourage people to trade on every new clue,
-  not just wait for certainty --- that is how real markets absorb news.
+  not just wait for certainty, that is how real markets absorb news.
 }
 
 % ---------------------------------------------------------------------
@@ -260,7 +263,7 @@
   Anchor them off known societies: QuantSoc around 2,185, SUMS around 2,648.
   Two accounts of a similar size lands you near 5--6,000. Reveal the real
   screenshots for the punchline: 3,418 plus 2,858 = 6,276. Point out how the
-  hints let a total stranger get within a few hundred --- that is the whole
+  hints let a total stranger get within a few hundred, that is the whole
   trick of market-making questions.
 }
 
@@ -291,7 +294,7 @@
   Even if they have never seen the antiderivative, they can bound it: the
   average height of $\ln$ between 1 and 100 is somewhere around 3.5--4, times a
   width of 99, so a few hundred. That estimate alone gets them close to 361.5.
-  The lesson: you rarely need the exact formula to make a good market --- a
+  The lesson: you rarely need the exact formula to make a good market, a
   rough bound plus an average is enough to quote a sensible price.
 }
 
@@ -307,9 +310,6 @@
     \textbf{highest} point (the summit of Mount Everest)?
   \end{sqt:definition}
 
-  \vspace{0.3cm}
-  \textcolor{sqt-question}{Make a market on the number of buildings. Hints on the
-  next slide.}
 \end{frame}
 
 \begin{frame}{Empire State Buildings: Hints}
@@ -333,7 +333,7 @@
   Break it into pieces they can each estimate. Depth of the ocean plus height
   of Everest is roughly 20 km. The Empire State Building is about 100 floors at
   roughly 4 m a floor, so around 400 m. Twenty thousand over four hundred is
-  about 50. The exact answer is 45 --- close enough that anyone quoting 40--55
+  about 50. The exact answer is 45, close enough that anyone quoting 40--55
   did great. This is the classic ``decompose an intimidating number into a few
   guesses'' interview move.
 }
@@ -357,9 +357,6 @@
     \item Fair price means averaging that payoff across all possible outcomes.
   \end{itemize}
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{An option gives you a choice. How much is that
-  choice worth?}
 \end{frame}
 \note{
   Start from the literal meaning of the word option. It is a choice. You are
@@ -493,13 +490,10 @@
     \end{tabular}
   \end{center}
 
-  \vspace{0.3cm}
-  \textcolor{sqt-question}{What is the fair price of this option?}
   % Fair value = (0+0+0+1+2+3)/6 = 1.
 \end{frame}
 \note{
-  First option they price by hand. Walk the payoff row: 0,0,0,1,2,3. Average it
-  --- that's 6 over 6 = 1. So the fair price is exactly 1. Notice it is worth
+  First option they price by hand. Walk the payoff row: 0,0,0,1,2,3. Average it, that's 6 over 6 = 1. So the fair price is exactly 1. Notice it is worth
   something even though half the time it pays zero: the upside outcomes carry
   all the value. That is the whole idea of an option in one number.
 }
@@ -528,8 +522,6 @@
     \item The put pays when at least one generated number is sufficiently low.
   \end{itemize}
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{Make an initial market before any numbers are revealed.}
 \end{frame}
 \note{
   The key feature is that the underlying is the worst of three draws, not the
@@ -621,8 +613,6 @@
     = 52.8
   \]
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{Initial theoretical fair value: approximately 53.}
 \end{frame}
 \note{
   This is where you can give the fair value. A clean continuous approximation
@@ -656,8 +646,6 @@
     \item Final settlement value: $\lvert S-25\rvert$.
   \end{itemize}
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{Make an initial market before any information is revealed.}
 \end{frame}
 \note{
   Set up the game cleanly. There are two sources of uncertainty: the rule and
@@ -678,8 +666,6 @@
     \item Re-price the \textbf{25-strike straddle}.
   \end{itemize}
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{How does learning $X=8$ change your market?}
 \end{frame}
 \note{
   They still face a mixture of addition and multiplication, but the first card
@@ -700,8 +686,6 @@
     \item Addition would have produced a much \textbf{narrower} range.
   \end{itemize}
 
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{Update your market again with the rule now known.}
 \end{frame}
 \note{
   This is the key information shock. Same first card, but knowing the rule
@@ -765,9 +749,9 @@
 \begin{frame}{Wrap Up}
   \textbf{What we did today:}
   \begin{itemize}
-    \item \textbf{Fair value} is expected value --- centre your market on it.
+    \item \textbf{Fair value} is expected value, centre your market on it.
     \item \textbf{Spreads} price your uncertainty; hidden information widens them.
-    \item \textbf{Estimation} under uncertainty --- update your market as clues land.
+    \item \textbf{Estimation} under uncertainty, update your market as clues land.
     \item \textbf{Options} price one-sided payoffs, $\mathbb{E}[\max(\cdot,0)]$,
       and let you trade the \textbf{shape of the distribution}.
   \end{itemize}
@@ -780,15 +764,14 @@
 
   \vspace{0.2cm}
   \begin{center}
-    \textcolor{sqt-question}{\large Thanks for trading with us! Questions?}
   \end{center}
 \end{frame}
 \note{
   Land the plane by tying the games together: every single asset today was
-  priced the same way --- expected value --- whether it was dice, followers, an
+  priced the same way, expected value, whether it was dice, followers, an
   integral, or an option. Spreads were about how confident you were. Options
   just added the max. For interviews: they will ask you to make a market on
-  something silly (golf balls in a bus); the move is always the same --- state
+  something silly (golf balls in a bus); the move is always the same, state
   a fair value, quote a width around it, and update fast. Thank them and open
   the floor.
 }
