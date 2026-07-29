@@ -125,27 +125,7 @@
   anyone up and forces people to actually price, not gamble.
 }
 
-\begin{frame}{How the Trading Engine Works}
-  \begin{enumerate}
-    \item Everyone connects to the same live \textbf{order book}.
-    \item You submit \textbf{bids} and \textbf{asks}; the book shows the best
-      bid and best ask to the whole room.
-    \item A \textbf{trade executes} when a bid and an ask cross at the same price.
-    \item At the end of the round the \textbf{true value is revealed} and every
-      position is \textbf{liquidated} (settled) at that value.
-  \end{enumerate}
-
-  \vspace{0.2cm}
-  \textcolor{sqt-question}{Your score is your PnL --- so price well, and don't
-  trade at bad levels.}
-\end{frame}
-\note{
-  Keep this practical --- most of it lands once they start playing. The one
-  thing to hammer: at settlement everything is marked to the true value, so a
-  trade only makes money if you got in at a better price than the truth. Tell
-  them not to be shy --- posting quotes is how you learn where the room thinks
-  value is.
-}
+\input{assets/trading_engine_intro.tex}
 
 
 % #####################################################################
