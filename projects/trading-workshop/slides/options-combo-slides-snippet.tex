@@ -1,0 +1,134 @@
+% Insert this helper near the top of main.tex, after the existing \payoff macro.
+\newcommand{\pdfplot}[1]{%
+  \begin{tikzpicture}[baseline=(current bounding box.center)]
+    \begin{axis}[
+      width=\linewidth,
+      height=4.8cm,
+      xmin=0, xmax=50,
+      ymin=0, ymax=1.15,
+      axis lines=left,
+      xtick={25},
+      xticklabels={$K$},
+      ytick=\empty,
+      xlabel={$S$},
+      ylabel={pdf},
+      clip=false
+    ]
+      #1
+    \end{axis}
+  \end{tikzpicture}}
+
+% Insert these slides immediately after:
+% \begin{frame}{Options Let You Express Views on the Distribution}
+% ...
+% \end{frame}
+
+\begin{frame}{Straddle}
+  \begin{columns}[T]
+    \begin{column}{0.53\textwidth}
+      \pdfplot{
+        \addplot[very thick, blue, domain=0:50, samples=300]
+          {0.80*exp(-((x-25)^2)/72) + 0.05*exp(-((x-25)^2)/260)};
+        \addplot[very thick, red!80!black, domain=0:50, samples=300]
+          {0.56*exp(-((x-25)^2)/150) + 0.10*exp(-((x-25)^2)/420)};
+        \node[anchor=north west, blue] at (rel axis cs:0.04,0.96) {\scriptsize before};
+        \node[anchor=north east, red!80!black] at (rel axis cs:0.96,0.96) {\scriptsize more variance};
+      }
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \centering
+      \payoff{
+        \draw[very thick, sqt-themecolour] (1.0,3.0) -- (3.0,0) -- (5.0,3.0);
+        \draw[dashed, gray] (3.0,-0.2) -- (3.0,3.2);
+      }
+    \end{column}
+  \end{columns}
+
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item Same centre, but more mass moves into the tails away from $K$.
+    \item A straddle likes larger moves in either direction, so wider pdf means more value.
+  \end{itemize}
+\end{frame}
+\note{
+  This is the clean vol slide. Hold the centre fixed at the strike and spread
+  the distribution out. The only thing that changed is variance, and that puts
+  more probability on outcomes where $|S-K|$ is large. That is exactly the
+  straddle payoff, so long straddles are long variance / long vol.
+}
+
+\begin{frame}{Risk Reversal}
+  \begin{columns}[T]
+    \begin{column}{0.53\textwidth}
+      \pdfplot{
+        \addplot[very thick, blue, domain=0:50, samples=300]
+          {0.72*exp(-((x-25)^2)/100) + 0.07*exp(-((x-25)^2)/320)};
+        \addplot[very thick, red!80!black, domain=0:50, samples=300]
+          {0.62*exp(-((x-27)^2)/88) + 0.14*exp(-((x-16)^2)/230)};
+        \node[anchor=north west, blue] at (rel axis cs:0.04,0.96) {\scriptsize before};
+        \node[anchor=south west, red!80!black] at (rel axis cs:0.04,0.08) {\scriptsize more negative skew};
+      }
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \centering
+      \payoff{
+        \draw[very thick, sqt-themecolour] (0.8,2.6) -- (2.0,1.4) -- (4.0,1.4) -- (5.6,0.0);
+        \draw[dashed, gray] (2.0,-0.2) -- (2.0,2.8);
+        \draw[dashed, gray] (4.0,-0.2) -- (4.0,2.0);
+      }
+
+      \vspace{0.3cm}
+      \textbf{Long put / short call risk reversal}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item More negative skew in the pdf means a fatter left tail.
+    \item Downside protection becomes more valuable than upside exposure, which helps a long put / short call structure.
+  \end{itemize}
+\end{frame}
+\note{
+  Use this to define skew in plain English: one tail is getting heavier, and
+  here it is the downside tail. The risk reversal is the natural skew trade
+  because it is long downside convexity and short upside convexity. As skew gets
+  more negative, puts should richen relative to calls.
+}
+
+\begin{frame}{Butterfly}
+  \begin{columns}[T]
+    \begin{column}{0.53\textwidth}
+      \pdfplot{
+        \addplot[very thick, blue, domain=0:50, samples=300]
+          {0.70*exp(-((x-25)^2)/70) + 0.05*exp(-((x-15)^2)/180) + 0.05*exp(-((x-35)^2)/180)};
+        \node[anchor=north east, blue] at (rel axis cs:0.96,0.96) {\scriptsize underlying pdf};
+      }
+    \end{column}
+    \begin{column}{0.43\textwidth}
+      \centering
+      \payoff{
+        \draw[thick, sqt-themecolour!55] (0.6,0.0) -- (1.8,1.2) -- (3.0,0.0);
+        \draw[thick, sqt-themecolour!75] (1.6,0.0) -- (3.0,2.0) -- (4.4,0.0);
+        \draw[thick, sqt-themecolour] (3.0,0.0) -- (4.2,1.1) -- (5.4,0.0);
+        \draw[dashed, gray] (1.8,-0.2) -- (1.8,1.4);
+        \draw[dashed, gray] (3.0,-0.2) -- (3.0,2.2);
+        \draw[dashed, gray] (4.2,-0.2) -- (4.2,1.3);
+      }
+
+      \vspace{0.3cm}
+      \textbf{Stacked butterflies}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.2cm}
+  \begin{itemize}
+    \item Overlaying butterflies across strikes gives a piecewise approximation to the underlying pdf.
+    \item Each narrow fly is a local density bet around its body strike.
+  \end{itemize}
+\end{frame}
+\note{
+  This is the bridge to the more advanced idea. A single narrow butterfly is a
+  local bet on density near its middle strike. If you line up lots of them
+  across strikes, the weights trace out an approximation to the market-implied
+  pdf of the underlying.
+}
