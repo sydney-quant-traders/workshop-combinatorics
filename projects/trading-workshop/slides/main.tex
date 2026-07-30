@@ -1,5 +1,6 @@
 \input{style/sqtbeamer.tex}
 \usepackage{tikz}
+\usetikzlibrary{calc}
 
 % Dice macros (\die{n}, \diehidden) for the trading sims.
 \input{assets/dice.tex}
@@ -35,7 +36,8 @@
 
 \begin{document}
 
-\maketitle
+% Custom cover slide (SQT x MathSoc), in place of the default \maketitle.
+\input{assets/title_slide.tex}
 
 % =====================================================================
 % NOTE ON FORMAT

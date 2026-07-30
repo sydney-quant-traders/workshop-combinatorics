@@ -1,0 +1,38 @@
+% Custom title slide. Background is the actual Combinatorics workshop cover
+% (assets/title_bg.png); we cover its card with a matching opaque panel and
+% put the Trading Workshop title + SQT x MathSoc logos on top.
+\definecolor{tw-card}{RGB}{19,28,52}
+
+{
+\begin{frame}[plain]
+\begin{tikzpicture}[remember picture,overlay]
+  \coordinate (C) at (current page.center);
+
+  % ---------- background (copied from Combinatorics cover) ----------
+  \node[inner sep=0] at (C)
+    {\includegraphics[width=\paperwidth,height=\paperheight]{assets/title_bg.png}};
+
+  % ---------- card: covers the cover's panel ----------
+  \fill[tw-card,rounded corners=16pt]
+    ($(C)+(-0.447\paperwidth,-0.315\paperheight)$)
+    rectangle ($(C)+(0.447\paperwidth,0.335\paperheight)$);
+  \draw[white,opacity=0.10,rounded corners=16pt,line width=0.6pt]
+    ($(C)+(-0.447\paperwidth,-0.315\paperheight)$)
+    rectangle ($(C)+(0.447\paperwidth,0.335\paperheight)$);
+
+  % ---------- logos ----------
+  \node[anchor=center] at ($(C)+(-3.05,1.55)$)
+    {\includegraphics[height=1.5cm]{assets/logo_sqt.png}};
+  \node[white,anchor=center] at ($(C)+(-1.5,1.55)$)
+    {\Large\bfseries$\times$};
+  \node[anchor=center] at ($(C)+(1.55,1.5)$)
+    {\includegraphics[height=0.95cm]{assets/logo_mathsoc_white.png}};
+
+  % ---------- title text ----------
+  \node[white,anchor=center] at ($(C)+(0,-0.55)$)
+    {\fontsize{32}{36}\selectfont\bfseries Trading Workshop};
+  \node[white,anchor=center,opacity=0.88] at ($(C)+(0,-2.25)$)
+    {\large Mock Trading with a Live Engine};
+\end{tikzpicture}
+\end{frame}
+}
